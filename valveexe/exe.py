@@ -1,18 +1,36 @@
-from builtins import object
-from typing import Pattern
 import os
 import uuid
 import time
 import subprocess
 import psutil
 import glob
-import re
 
 from rcon import Client
+
+from valveexe.logger import Logger
+from valveexe.console import RconConsole, ExecConsole
 
 
 class ValveExe(object):
     def __init__(self, gameExe, gameDir, steamExe=None, appid=None):
+        '''Defines a launchable source engine game to be interacted with.
+
+        .. note:: Some games cannot be launched by their .exe alone \
+        (ex:csgo, probably for anti-cheat related reasons). \
+        Those games need to include the optional parameters :any:`steamExe` \
+        and :any:`appid`. Those parameters are only to be used if \
+        absolutely needed, they are a fallback and will downgrade ValveEXE \
+        functionnality if present.
+
+        :param gameExe: the path for the game executable.
+        :type gameExe: path, str
+        :param gameDir: The mod directory.
+        :type gameDir: path, str
+        :param steamExe: The path for the Steam executable.
+        :type steamExe: optional, path, str
+        :param appid: The `Steam AppID <https://developer.valvesoftware.com/wiki/Steam_Application_IDs>`_.
+        :type appid: optional, int
+        '''
 
         self.gameExe = gameExe
         self.gameDir = gameDir
@@ -26,13 +44,20 @@ class ValveExe(object):
         self.logName = 'valve-exe-' + self.uuid + '.log'
         self.logPath = os.path.join(gameDir, self.logName)
 
-        self._full_cleanup()
+        self.console = None
 
         self.rcon_enabled = None
-        self.console = None
-        self.hijacked = False
+        self.hijacked = None
+
+        self._full_cleanup()
 
     def launch(self, *params):
+        '''Launches the game as specified in :any:`__init__` with the
+        launch parameters supplied as arguments.
+
+        :param \*params: The launch parameters to be supplied to the executable.
+        :type \*params: str
+        '''
         if self.steamExe and self.appid:
             self._terminate_process()  # Steam launches cannot be hijacked
             launch_params = [self.steamExe, '-applaunch', str(self.appid)]
@@ -59,14 +84,24 @@ class ValveExe(object):
 
         self.logger = Logger(self.logPath)
 
-    def run(self, command, *param):
+    def run(self, command, *params):
+        '''Forwards a command with its parameters to the active :any:`VConsole`
+
+        :param command: A Source Engine `console command \
+        <https://developer.valvesoftware.com/wiki/Console_Command_List>`_.
+        :type command: str
+        :param \*params: The values to be included with the command.
+        :type \*params: str
+        '''
+
         if self.console:
-            self.console.run(command, *param)
+            self.console.run(command, *params)
         else:
             with self as console:
-                console.run(command, *param)
+                console.run(command, *params)
 
     def quit(self):
+        '''Closes the game client'''
         process = self.process or self._find_process(self)
         if process:
             process.terminate()
@@ -129,98 +164,3 @@ class ValveExe(object):
                 os.remove(f)
             except:
                 pass
-
-
-class Logger(object):
-
-    def __init__(self, logpath):
-        '''
-        Tracks console output by leveraging con_logfile.
-        Supported in most source games (not l4d2)
-        '''
-        self.logPath = logpath
-        self.logs = ''
-        self.bookmark = 0
-
-    def log_until(self, until=None):
-        logs_since = ''  # all logs since the previous log_until()
-        with open(self.logPath, mode='r') as f:
-            f.seek(self.bookmark, 0)
-            while not re.search(until, logs_since):
-                time.sleep(0.5)
-                for line in f.readlines():
-                    self.logs += line
-                    logs_since += line
-                    self.bookmark = f.tell()
-
-    def __del__(self):
-        try:
-            if os.path.exists(self.logPath):
-                os.remove(self.logPath)
-        except:
-            pass
-
-
-class VConsole(object):
-    def run(self, command, *param):
-        pass
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self):
-        pass
-
-
-class RconConsole(VConsole):
-    '''
-    Issues commands by leveraging RCON.
-    this is supported by most multiplayer games
-    '''
-
-    def __init__(self, ip, port, passwd):
-        self.client = Client(ip, port, passwd=passwd)
-
-    def run(self, command, *params):
-        return self.client.run(command, *params)
-
-    def __enter__(self):
-        self.client.__enter__()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.client.__exit__(exc_type, exc_val, exc_tb)
-
-
-class ExecConsole(VConsole):
-    '''
-    Issues commands by using the -hijack alongside a +exec statement.
-    this is supported by games that support -hijack (not csgo)
-    '''
-
-    def __init__(self, gameExe, gameDir, uuid):
-        self.gameExe = gameExe
-        self.gameDir = gameDir
-        self.cfgName = 'valve-exe-' + uuid + '.cfg'
-        self.cfgPath = os.path.join(self.gameDir, 'cfg', self.cfgName)
-
-    def run(self, command, *params):
-        with open(self.cfgPath, "w+") as f:
-            f.seek(0)
-            f.write(command + ' ' + ' '.join(params))
-            f.truncate()
-
-        launch_params = [self.gameExe, '-hijack', '+exec', self.cfgName]
-        self.process = subprocess.Popen(
-            launch_params,
-            creationflags=subprocess.DETACHED_PROCESS |
-            subprocess.CREATE_NEW_PROCESS_GROUP)
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        try:
-            if os.path.exists(self.cfgPath):
-                os.remove(self.cfgPath)
-        except:
-            pass

@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-from future import standard_library
-standard_library.install_aliases()
-from valveexe.exe import *
+from valveexe.exe import ValveExe
+from valveexe.logger import Logger
+from valveexe.console import VConsole, RconConsole, ExecConsole
