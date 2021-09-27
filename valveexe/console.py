@@ -1,4 +1,5 @@
 import os
+import time
 import subprocess
 
 from rcon import Client
@@ -75,7 +76,7 @@ class ExecConsole(VConsole):
         self.cfgPath = os.path.join(self.gameDir, 'cfg', self.cfgName)
 
     def run(self, command, *params):
-        with open(self.cfgPath, "w+") as f:
+        with open(self.cfgPath, "w") as f:
             f.seek(0)
             f.write(command + ' ' + ' '.join(params))
             f.truncate()
@@ -85,6 +86,8 @@ class ExecConsole(VConsole):
             launch_params,
             creationflags=subprocess.DETACHED_PROCESS |
             subprocess.CREATE_NEW_PROCESS_GROUP)
+
+        time.sleep(1) # leaves time for the game to read the command
 
     def __enter__(self):
         pass

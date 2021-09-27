@@ -50,6 +50,7 @@ class Logger():
                 logs_since_until += self.log_ingest()
                 if not until:
                     break
+        return logs_since_until
 
     def __del__(self):
         try:

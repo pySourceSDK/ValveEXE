@@ -39,7 +39,7 @@ class ValveExe(object):
         self.appid = appid
         self.steamExe = steamExe
 
-        self.uuid = str(uuid.uuid4())
+        self.uuid = str(uuid.uuid4()).split('-')[-1]
 
         self.logName = 'valve-exe-' + self.uuid + '.log'
         self.logPath = os.path.join(gameDir, self.logName)
@@ -64,16 +64,16 @@ class ValveExe(object):
         else:
             self.hijacked = bool(self._find_process())
             launch_params = [self.gameExe, '-hijack']
-            launch_params.extend(['-game', self.gameDir])
-            launch_params.extend(['+log', '0', '+sv_logflush', '1',
-                                  '+con_logfile', self.logName])
+
+        launch_params.extend(['-game', self.gameDir])
+        launch_params.extend(['+log', '0', '+sv_logflush', '1',
+                              '+con_logfile', self.logName])
 
         if self._check_rcon_eligible() is not False:
             launch_params.extend(['-usercon', '+ip', '0.0.0.0',
                                   '+rcon_password', self.uuid])
 
         launch_params.extend(list(*params))
-
         self.process = subprocess.Popen(
             launch_params,
             creationflags=subprocess.DETACHED_PROCESS |
