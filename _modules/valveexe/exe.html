@@ -42,6 +42,7 @@
 
 <span class="kn">from</span> <span class="nn">rcon</span> <span class="kn">import</span> <span class="n">Client</span>
 
+<span class="kn">from</span> <span class="nn">valveexe.utils</span> <span class="kn">import</span> <span class="n">find_process</span><span class="p">,</span> <span class="n">terminate_process</span>
 <span class="kn">from</span> <span class="nn">valveexe.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span> <span class="nn">valveexe.console</span> <span class="kn">import</span> <span class="n">RconConsole</span><span class="p">,</span> <span class="n">ExecConsole</span>
 
@@ -74,7 +75,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">appid</span> <span class="o">=</span> <span class="n">appid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span> <span class="o">=</span> <span class="n">steamExe</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logName</span> <span class="o">=</span> <span class="s1">&#39;valve-exe-&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gameDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logName</span><span class="p">)</span>
@@ -94,21 +95,21 @@
 <span class="sd">        :type \*params: str</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_process</span><span class="p">()</span>  <span class="c1"># Steam launches cannot be hijacked</span>
+            <span class="n">terminate_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>  <span class="c1"># Steam launches cannot be hijacked</span>
             <span class="n">launch_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span><span class="p">,</span> <span class="s1">&#39;-applaunch&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">)]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hijacked</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_find_process</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hijacked</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">))</span>
             <span class="n">launch_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gameExe</span><span class="p">,</span> <span class="s1">&#39;-hijack&#39;</span><span class="p">]</span>
-            <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-game&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="p">])</span>
-            <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;+log&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;+sv_logflush&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;+con_logfile&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logName</span><span class="p">])</span>
+
+        <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-game&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="p">])</span>
+        <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;+log&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;+sv_logflush&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;+con_logfile&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logName</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_rcon_eligible</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-usercon&#39;</span><span class="p">,</span> <span class="s1">&#39;+ip&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;+rcon_password&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">])</span>
 
         <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">))</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
             <span class="n">launch_params</span><span class="p">,</span>
             <span class="n">creationflags</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DETACHED_PROCESS</span> <span class="o">|</span>
@@ -128,7 +129,8 @@
 <span class="sd">        :param \*params: The values to be included with the command.</span>
 <span class="sd">        :type \*params: str</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -137,9 +139,10 @@
 
 <div class="viewcode-block" id="ValveExe.quit"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe.quit">[docs]</a>    <span class="k">def</span> <span class="nf">quit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Closes the game client&#39;&#39;&#39;</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">or</span> <span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">process</span><span class="p">:</span>
-            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">_check_rcon_eligible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -147,12 +150,13 @@
 <span class="sd">        True: Eligible</span>
 <span class="sd">        False: Not eligible</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_process</span><span class="p">()</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">process</span><span class="p">:</span>
             <span class="c1"># no process running</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">():</span>
-            <span class="c1"># wrong game open</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">()</span> <span class="ow">and</span> \
+             <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">():</span>
+            <span class="c1"># wrong game </span>
             <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="s1">&#39;-usercon&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">():</span>
@@ -161,14 +165,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># &#39;connections&#39; confirms game is listening for rcon</span>
             <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">connections</span><span class="p">())</span>
-
-    <span class="k">def</span> <span class="nf">_find_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">psutil</span><span class="o">.</span><span class="n">process_iter</span><span class="p">()</span> <span class="k">if</span>
-                     <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_terminate_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_process</span><span class="p">()</span>
-        <span class="n">process</span> <span class="ow">and</span> <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_rcon_eligible</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
