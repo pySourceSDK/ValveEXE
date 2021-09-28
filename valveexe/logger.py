@@ -37,11 +37,12 @@ class Logger():
     def log_until(self, until=None):
         '''
         Will :any:`log_ingest()<log_ingest>` until a specified regex is
-        found within the logs.
+        found within the logs and returns the logs until that point.
 
         :param until: A regex string to match against the logs
         :type until: str
-         '''
+        :rtype: str
+        '''
         logs_since_until = ''  # all logs since the previous log_until()
         with open(self.logPath, mode='r') as f:
 
