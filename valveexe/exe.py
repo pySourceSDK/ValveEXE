@@ -7,6 +7,7 @@ import glob
 
 from rcon import Client
 
+from valveexe.utils import find_process, terminate_process
 from valveexe.logger import Logger
 from valveexe.console import RconConsole, ExecConsole
 
@@ -59,10 +60,10 @@ class ValveExe(object):
         :type \*params: str
         '''
         if self.steamExe and self.appid:
-            self._terminate_process()  # Steam launches cannot be hijacked
+            terminate_process(self.exeName)  # Steam launches cannot be hijacked
             launch_params = [self.steamExe, '-applaunch', str(self.appid)]
         else:
-            self.hijacked = bool(self._find_process())
+            self.hijacked = bool(find_process(self.exeName))
             launch_params = [self.gameExe, '-hijack']
 
         launch_params.extend(['-game', self.gameDir])
@@ -93,7 +94,8 @@ class ValveExe(object):
         :param \*params: The values to be included with the command.
         :type \*params: str
         '''
-
+        if not self.process:
+            return
         if self.console:
             self.console.run(command, *params)
         else:
@@ -102,9 +104,10 @@ class ValveExe(object):
 
     def quit(self):
         '''Closes the game client'''
-        process = self.process or self._find_process(self)
+        process = self.process or find_process(self.exeName)
         if process:
             process.terminate()
+        self.process = None
 
     def _check_rcon_eligible(self):
         '''
@@ -112,12 +115,13 @@ class ValveExe(object):
         True: Eligible
         False: Not eligible
         '''
-        process = self._find_process()
+        process = find_process(self.exeName)
         if not process:
             # no process running
             return None
-        elif self.gameDir not in process.cmdline():
-            # wrong game open
+        elif self.gameDir not in process.cmdline() and \
+             self.gameDir.split('\\')[-1] not in process.cmdline():
+            # wrong game 
             process.terminate()
             return None
         elif '-usercon' not in process.cmdline():
@@ -126,14 +130,6 @@ class ValveExe(object):
         else:
             # 'connections' confirms game is listening for rcon
             return bool(process.connections())
-
-    def _find_process(self):
-        return next((p for p in psutil.process_iter() if
-                     p.name() == self.exeName), None)
-
-    def _terminate_process(self):
-        process = self._find_process()
-        process and process.terminate()
 
     def __enter__(self):
         while self._check_rcon_eligible() is None:
