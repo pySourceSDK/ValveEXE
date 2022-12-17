@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
     name='valveexe',
     packages=['valveexe'],
-    version='0.1.1',
+    version='0.1.2',
     license='gpl-3.0',
     description='A library to interact with Source engine game\'s developer console',
     author='Maxime Dupuis',
