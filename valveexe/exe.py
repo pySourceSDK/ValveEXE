@@ -60,7 +60,8 @@ class ValveExe(object):
         :type \*params: str
         '''
         if self.steamExe and self.appid:
-            terminate_process(self.exeName)  # Steam launches cannot be hijacked
+            # Steam launches cannot be hijacked
+            terminate_process(self.exeName)
             launch_params = [self.steamExe, '-applaunch', str(self.appid)]
         else:
             self.hijacked = bool(find_process(self.exeName))
@@ -120,8 +121,8 @@ class ValveExe(object):
             # no process running
             return None
         elif self.gameDir not in process.cmdline() and \
-             self.gameDir.split('\\')[-1] not in process.cmdline():
-            # wrong game 
+                self.gameDir.split('\\')[-1] not in process.cmdline():
+            # wrong game
             process.terminate()
             return None
         elif '-usercon' not in process.cmdline():

@@ -1,12 +1,15 @@
 Welcome to ValveEXE's documentation!
 ====================================
 
+.. License
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :target: https://github.com/pySourceSDK/ValveEXE/blob/master/LICENSE.txt
 
+.. Python versions
 .. image:: https://img.shields.io/pypi/pyversions/valveexe.svg
    :target: https://pypi.python.org/pypi/valveexe/
 
+.. Pypi versions
 .. image:: https://badge.fury.io/py/valveexe.svg
    :target: https://pypi.python.org/pypi/valveexe/
 

@@ -70,12 +70,16 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = [
+    "*~",
+    "*/#*#*",
+    "*.#*"
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -92,7 +96,10 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'description': 'A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project'
+}
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -197,3 +204,8 @@ autodoc_member_order = 'bysource'
 autoclass_content = 'class'
 html_logo = 'pysourcesdk_exe.png'
 html_favicon = 'favicon.ico'
+
+
+rst_epilog = f'''
+.. |proj_name| replace:: {project}
+'''
