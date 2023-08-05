@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>valveexe.exe &#8212; ValveEXE 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=a0f8683c" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=def9ab29"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for valveexe.exe</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="kn">from</span> <span class="nn">rcon</span> <span class="kn">import</span> <span class="n">Client</span>
+
+<span class="kn">from</span> <span class="nn">valveexe.utils</span> <span class="kn">import</span> <span class="n">find_process</span><span class="p">,</span> <span class="n">terminate_process</span>
+<span class="kn">from</span> <span class="nn">valveexe.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">valveexe.console</span> <span class="kn">import</span> <span class="n">RconConsole</span><span class="p">,</span> <span class="n">ExecConsole</span>
+
+
+<div class="viewcode-block" id="ValveExe"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe">[docs]</a><span class="k">class</span> <span class="nc">ValveExe</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ValveExe.__init__"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gameExe</span><span class="p">,</span> <span class="n">gameDir</span><span class="p">,</span> <span class="n">steamExe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">appid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Defines a launchable source engine game to be interacted with.</span>
+
+<span class="sd">        .. note:: Some games cannot be launched by their .exe alone \</span>
+<span class="sd">        (ex:csgo, probably for anti-cheat related reasons). \</span>
+<span class="sd">        Those games need to include the optional parameters :any:`steamExe` \</span>
+<span class="sd">        and :any:`appid`. Those parameters are only to be used if \</span>
+<span class="sd">        absolutely needed, they are a fallback and will downgrade ValveEXE \</span>
+<span class="sd">        functionnality if present.</span>
+
+<span class="sd">        :param gameExe: the path for the game executable.</span>
+<span class="sd">        :type gameExe: path, str</span>
+<span class="sd">        :param gameDir: The mod directory.</span>
+<span class="sd">        :type gameDir: path, str</span>
+<span class="sd">        :param steamExe: The path for the Steam executable.</span>
+<span class="sd">        :type steamExe: optional, path, str</span>
+<span class="sd">        :param appid: The `Steam AppID &lt;https://developer.valvesoftware.com/wiki/Steam_Application_IDs&gt;`_.</span>
+<span class="sd">        :type appid: optional, int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gameExe</span> <span class="o">=</span> <span class="n">gameExe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span> <span class="o">=</span> <span class="n">gameDir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exeName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameExe</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">appid</span> <span class="o">=</span> <span class="n">appid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span> <span class="o">=</span> <span class="n">steamExe</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logName</span> <span class="o">=</span> <span class="s1">&#39;valve-exe-&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gameDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logName</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rcon_enabled</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hijacked</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_full_cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ValveExe.launch"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Launches the game as specified in :any:`__init__` with the</span>
+<span class="sd">        launch parameters supplied as arguments.</span>
+
+<span class="sd">        :param \*params: The launch parameters to be supplied to the executable.</span>
+<span class="sd">        :type \*params: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">:</span>
+            <span class="c1"># Steam launches cannot be hijacked</span>
+            <span class="n">terminate_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>
+            <span class="n">launch_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">steamExe</span><span class="p">,</span> <span class="s1">&#39;-applaunch&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appid</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hijacked</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">))</span>
+            <span class="n">launch_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gameExe</span><span class="p">,</span> <span class="s1">&#39;-hijack&#39;</span><span class="p">]</span>
+
+        <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-game&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="p">])</span>
+        <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;+log&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;+sv_logflush&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;+con_logfile&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logName</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_rcon_eligible</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-usercon&#39;</span><span class="p">,</span> <span class="s1">&#39;+ip&#39;</span><span class="p">,</span> <span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;+rcon_password&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">])</span>
+
+        <span class="n">launch_params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">launch_params</span><span class="p">,</span>
+            <span class="n">creationflags</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DETACHED_PROCESS</span> <span class="o">|</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">CREATE_NEW_PROCESS_GROUP</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logPath</span><span class="p">):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logPath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ValveExe.run"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Forwards a command with its parameters to the active :any:`VConsole`</span>
+
+<span class="sd">        :param command: A Source Engine `console command \</span>
+<span class="sd">        &lt;https://developer.valvesoftware.com/wiki/Console_Command_List&gt;`_.</span>
+<span class="sd">        :type command: str</span>
+<span class="sd">        :param \*params: The values to be included with the command.</span>
+<span class="sd">        :type \*params: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span> <span class="k">as</span> <span class="n">console</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ValveExe.quit"><a class="viewcode-back" href="../../api/valveexe.html#valveexe.ValveExe.quit">[docs]</a>    <span class="k">def</span> <span class="nf">quit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Closes the game client&#39;&#39;&#39;</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">or</span> <span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">process</span><span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_rcon_eligible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        None: Unknown</span>
+<span class="sd">        True: Eligible</span>
+<span class="sd">        False: Not eligible</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">find_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exeName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">process</span><span class="p">:</span>
+            <span class="c1"># no process running</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">()</span> <span class="ow">and</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">():</span>
+            <span class="c1"># wrong game</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="s1">&#39;-usercon&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">cmdline</span><span class="p">():</span>
+            <span class="c1"># doesn&#39;t have rcon enabled</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># &#39;connections&#39; confirms game is listening for rcon</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">connections</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_rcon_eligible</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_rcon_eligible</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">console</span> <span class="o">=</span> <span class="n">RconConsole</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">27015</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">console</span> <span class="o">=</span> <span class="n">ExecConsole</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gameExe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">console</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">console</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;con_logfile&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&quot;&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+
+    <span class="k">def</span> <span class="nf">_full_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gameDir</span> <span class="o">+</span> <span class="s1">&#39;valve-exe-*.log&#39;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/pysourcesdk_exe.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../index.html">ValveEXE</a></h1>
+
+
+
+<p class="blurb">A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Maxime Dupuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

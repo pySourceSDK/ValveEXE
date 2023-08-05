@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>valveexe.logger &#8212; ValveEXE 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css?v=a0f8683c" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=def9ab29"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for valveexe.logger</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../api/logger.html#valveexe.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Tracks console output by leveraging the `con_logfile` command.</span>
+<span class="sd">    Supported in most source games (except l4d2)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="Logger.__init__"><a class="viewcode-back" href="../../api/logger.html#valveexe.Logger.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logpath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param logpath: The path to the log file</span>
+<span class="sd">        :type logpath: path, str</span>
+<span class="sd">         &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logPath</span> <span class="o">=</span> <span class="n">logpath</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1">#: :type: (str) - all the logs accumulated so far</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bookmark</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Logger.log_ingest"><a class="viewcode-back" href="../../api/logger.html#valveexe.Logger.log_ingest">[docs]</a>    <span class="k">def</span> <span class="nf">log_ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Will resume reading the logs from where it last left off until the end</span>
+<span class="sd">        and return all logs since</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logs_since_bookmark</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logPath</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bookmark</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs</span> <span class="o">+=</span> <span class="n">line</span>
+                <span class="n">logs_since_bookmark</span> <span class="o">+=</span> <span class="n">line</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_bookmark</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">logs_since_bookmark</span></div>
+
+<div class="viewcode-block" id="Logger.log_until"><a class="viewcode-back" href="../../api/logger.html#valveexe.Logger.log_until">[docs]</a>    <span class="k">def</span> <span class="nf">log_until</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Will :any:`log_ingest()&lt;log_ingest&gt;` until a specified regex is</span>
+<span class="sd">        found within the logs and returns the logs until that point.</span>
+
+<span class="sd">        :param until: A regex string to match against the logs</span>
+<span class="sd">        :type until: str</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">logs_since_until</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># all logs since the previous log_until()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logPath</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">until</span><span class="p">,</span> <span class="n">logs_since_until</span><span class="p">):</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">logs_since_until</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_ingest</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">until</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">logs_since_until</span></div>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logPath</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/pysourcesdk_exe.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../../index.html">ValveEXE</a></h1>
+
+
+
+<p class="blurb">A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Maxime Dupuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

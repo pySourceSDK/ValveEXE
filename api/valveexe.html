@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ValveExe &#8212; ValveEXE 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a0f8683c" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=def9ab29"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Console" href="console.html" />
+    <link rel="prev" title="API" href="../api_ref.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="valveexe">
+<h1>ValveExe<a class="headerlink" href="#valveexe" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="valveexe.ValveExe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">valveexe.</span></span><span class="sig-name descname"><span class="pre">ValveExe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gameExe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gameDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steamExe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/exe.html#ValveExe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ValveExe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ValveExe.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gameExe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gameDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steamExe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">appid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/exe.html#ValveExe.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ValveExe.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a launchable source engine game to be interacted with.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some games cannot be launched by their .exe alone         (ex:csgo, probably for anti-cheat related reasons).         Those games need to include the optional parameters <code class="xref any docutils literal notranslate"><span class="pre">steamExe</span></code>         and <code class="xref any docutils literal notranslate"><span class="pre">appid</span></code>. Those parameters are only to be used if         absolutely needed, they are a fallback and will downgrade ValveEXE         functionnality if present.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gameExe</strong> (<em>path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – the path for the game executable.</p></li>
+<li><p><strong>gameDir</strong> (<em>path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The mod directory.</p></li>
+<li><p><strong>steamExe</strong> (<em>optional</em><em>, </em><em>path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The path for the Steam executable.</p></li>
+<li><p><strong>appid</strong> (<em>optional</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The <a class="reference external" href="https://developer.valvesoftware.com/wiki/Steam_Application_IDs">Steam AppID</a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ValveExe.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/exe.html#ValveExe.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ValveExe.launch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launches the game as specified in <a class="reference internal" href="#valveexe.ValveExe.__init__" title="valveexe.ValveExe.__init__"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">__init__</span></code></a> with the
+launch parameters supplied as arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The launch parameters to be supplied to the executable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ValveExe.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/exe.html#ValveExe.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ValveExe.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forwards a command with its parameters to the active <a class="reference internal" href="console.html#valveexe.VConsole" title="valveexe.VConsole"><code class="xref any py py-class docutils literal notranslate"><span class="pre">VConsole</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A Source Engine <a class="reference external" href="https://developer.valvesoftware.com/wiki/Console_Command_List">console command</a>.</p></li>
+<li><p><strong>*params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The values to be included with the command.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ValveExe.quit">
+<span class="sig-name descname"><span class="pre">quit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/exe.html#ValveExe.quit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ValveExe.quit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the game client</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/pysourcesdk_exe.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">ValveEXE</a></h1>
+
+
+
+<p class="blurb">A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ValveExe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="console.html">Console</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger.html">Logger</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api_ref.html">API</a><ul>
+      <li>Previous: <a href="../api_ref.html" title="previous chapter">API</a></li>
+      <li>Next: <a href="console.html" title="next chapter">Console</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Maxime Dupuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/api/valveexe.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

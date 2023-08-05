@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Console &#8212; ValveEXE 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=a0f8683c" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=def9ab29"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Logger" href="logger.html" />
+    <link rel="prev" title="ValveExe" href="valveexe.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="console">
+<h1>Console<a class="headerlink" href="#console" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="valveexe.RconConsole">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">valveexe.</span></span><span class="sig-name descname"><span class="pre">RconConsole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#RconConsole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.RconConsole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#valveexe.VConsole" title="valveexe.console.VConsole"><code class="xref py py-class docutils literal notranslate"><span class="pre">VConsole</span></code></a></p>
+<p>Issues commands by leveraging RCON.
+This is supported by most multiplayer games.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.RconConsole.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#RconConsole.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.RconConsole.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The IP the game client is listening on (usually “127.0.0.1”).</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The port the game client is listening on (usually 27015).</p></li>
+<li><p><strong>passwd</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The Rcon password to be used to issue commands.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.RconConsole.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#RconConsole.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.RconConsole.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a specified command with it’s parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A Source Engine <a class="reference external" href="https://developer.valvesoftware.com/wiki/Console_Command_List">console command</a>.</p></li>
+<li><p><strong>*params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The values to be included with the command.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="valveexe.ExecConsole">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">valveexe.</span></span><span class="sig-name descname"><span class="pre">ExecConsole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gameExe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gameDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#ExecConsole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ExecConsole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#valveexe.VConsole" title="valveexe.console.VConsole"><code class="xref py py-class docutils literal notranslate"><span class="pre">VConsole</span></code></a></p>
+<p>Issues commands by using the -hijack launch parameters alongside a +exec statement.
+This is supported by games that support -hijack (not csgo).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ExecConsole.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gameExe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gameDir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#ExecConsole.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ExecConsole.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gameExe</strong> (<em>path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The path to the game executable.</p></li>
+<li><p><strong>gameDir</strong> (<em>path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The path to the mod folder.</p></li>
+<li><p><strong>uuid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – A unique identifier for the config name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.ExecConsole.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#ExecConsole.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.ExecConsole.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a specified command with it’s parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – <p>A Source Engine <a class="reference external" href="https://developer.valvesoftware.com/wiki/Console_Command_List">console command</a>.</p>
+</p></li>
+<li><p><strong>*params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The values to be included with the command.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="valveexe.VConsole">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">valveexe.</span></span><span class="sig-name descname"><span class="pre">VConsole</span></span><a class="reference internal" href="../_modules/valveexe/console.html#VConsole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.VConsole" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract definition for the different types of console
+implementations. All implementation are intended to receive
+commands via the <a class="reference internal" href="#valveexe.VConsole.run" title="valveexe.VConsole.run"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> function</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="valveexe.VConsole.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/valveexe/console.html#VConsole.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#valveexe.VConsole.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a specified command with it’s parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – <p>A Source Engine <a class="reference external" href="https://developer.valvesoftware.com/wiki/Console_Command_List">console command</a>.</p>
+</p></li>
+<li><p><strong>*params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The values to be included with the command.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/pysourcesdk_exe.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="../index.html">ValveEXE</a></h1>
+
+
+
+<p class="blurb">A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="valveexe.html">ValveExe</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Console</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger.html">Logger</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api_ref.html">API</a><ul>
+      <li>Previous: <a href="valveexe.html" title="previous chapter">ValveExe</a></li>
+      <li>Next: <a href="logger.html" title="next chapter">Logger</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Maxime Dupuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/api/console.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

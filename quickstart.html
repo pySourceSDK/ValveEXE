@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quickstart &#8212; ValveEXE 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=a0f8683c" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=def9ab29"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api_ref.html" />
+    <link rel="prev" title="Welcome to ValveEXE’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h1>
+<p>Get yourself up and running quickly.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<section id="pypi">
+<h3>PyPI<a class="headerlink" href="#pypi" title="Permalink to this heading">¶</a></h3>
+<p>ValveEXE is available on the Python Package Index. This makes installing it with pip as easy as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3<span class="w"> </span>install<span class="w"> </span>valveexe
+</pre></div>
+</div>
+</section>
+<section id="git">
+<h3>Git<a class="headerlink" href="#git" title="Permalink to this heading">¶</a></h3>
+<p>If you want the latest code or even feel like contributing, the code is available on GitHub.</p>
+<p>You can easily clone the code with git:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git://github.com/pySourceSDK/ValveEXE.git
+</pre></div>
+</div>
+<p>and install it from the repo directory with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>setup.py<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>Here’s a few example usage of ValveEXE</p>
+<section id="sending-a-command-to-the-client">
+<h3>Sending a command to the client<a class="headerlink" href="#sending-a-command-to-the-client" title="Permalink to this heading">¶</a></h3>
+<p>Parsing can be done by creating an instance of Exe with a path.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="kn">from</span> <span class="nn">valveexe</span> <span class="kn">import</span> <span class="n">ValveExe</span>
+<span class="o">&gt;</span> <span class="n">tf2</span> <span class="o">=</span> <span class="n">ValveExe</span><span class="p">(</span><span class="s1">&#39;C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2\hl2.exe&#39;</span><span class="p">,</span> <span class="c1"># exe path</span>
+                 <span class="s1">&#39;C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2</span><span class="se">\t</span><span class="s1">f&#39;</span><span class="p">)</span> <span class="c1"># mod dir</span>
+
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s1">&#39;-windowed&#39;</span><span class="p">,</span> <span class="s1">&#39;-novid&#39;</span><span class="p">,</span> <span class="s1">&#39;+map&#39;</span><span class="p">,</span> <span class="s1">&#39;ctf_2fort&#39;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;nav_generate&#39;</span><span class="p">)</span> <span class="c1"># will run the command &quot;nav_generate&quot;</span>
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_until</span><span class="p">(</span><span class="s2">&quot;\.nav&#39; saved\.&quot;</span><span class="p">)</span> <span class="c1"># will wait until the log matches the provided regex string</span>
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span> <span class="c1"># exits the game</span>
+</pre></div>
+</div>
+</section>
+<section id="sending-multiple-commands-to-the-client">
+<h3>Sending multiple commands to the client<a class="headerlink" href="#sending-multiple-commands-to-the-client" title="Permalink to this heading">¶</a></h3>
+<p>If you wish to perform multiple commands without ValveEXE reconnecting to RCON each time, The previous example could be reimplemented using the ‘with’ keyword.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="kn">from</span> <span class="nn">valveexe</span> <span class="kn">import</span> <span class="n">ValveExe</span>
+<span class="o">&gt;</span> <span class="n">tf2</span> <span class="o">=</span> <span class="n">ValveExe</span><span class="p">(</span><span class="s1">&#39;C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2\hl2.exe&#39;</span><span class="p">,</span> <span class="c1"># exe path</span>
+                 <span class="s1">&#39;C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2</span><span class="se">\t</span><span class="s1">f&#39;</span><span class="p">)</span> <span class="c1"># mod dir</span>
+
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s1">&#39;-windowed&#39;</span><span class="p">,</span> <span class="s1">&#39;-novid&#39;</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="k">with</span> <span class="n">tf2</span> <span class="k">as</span> <span class="n">console</span><span class="p">:</span>
+<span class="o">&gt;</span>   <span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;ctf_2fort&#39;</span><span class="p">)</span> <span class="c1"># Will load the map</span>
+<span class="o">&gt;</span>   <span class="n">tf2</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_until</span><span class="p">(</span><span class="s1">&#39;Redownloading all lightmaps&#39;</span><span class="p">)</span> <span class="c1"># Map is done loading</span>
+<span class="o">&gt;</span>   <span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;nav_generate&#39;</span><span class="p">)</span> <span class="c1"># will run the command &quot;nav_generate&quot;</span>
+<span class="o">&gt;</span>   <span class="n">tf2</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log_until</span><span class="p">(</span><span class="s2">&quot;\.nav&#39; saved\.&quot;</span><span class="p">)</span> <span class="c1"># nav is done generating</span>
+<span class="o">&gt;</span>   <span class="n">console</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">)</span> <span class="c1"># exits the map</span>
+<span class="o">&gt;</span> <span class="n">tf2</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span> <span class="c1"># exits the game</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pysourcesdk_exe.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">ValveEXE</a></h1>
+
+
+
+<p class="blurb">A <a href="https://pysourcesdk.github.io/hub/">pySourceSDK</a> project</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to ValveEXE’s documentation!</a></li>
+      <li>Next: <a href="api_ref.html" title="next chapter">API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Maxime Dupuis.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/quickstart.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
