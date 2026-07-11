@@ -46,6 +46,8 @@ class ValveExe(object):
         self.logPath = os.path.join(gameDir, self.logName)
 
         self.console = None
+        self.process = None
+        self.logger = None
 
         self.rcon_enabled = None
         self.hijacked = None
@@ -153,7 +155,10 @@ class ValveExe(object):
             self.run('con_logfile', '""')
         except:
             pass
-        del self.logger
+        try:
+            del self.logger
+        except AttributeError:
+            pass
 
     def _full_cleanup(self):
         for f in glob.glob(self.gameDir + 'valve-exe-*.log'):
