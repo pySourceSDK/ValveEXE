@@ -29,7 +29,7 @@ setup(
     install_requires=['psutil', 'rcon'],
     python_requires='>=3.10',
     classifiers=[
-        'Development Status :: 3 - Alpha ',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
