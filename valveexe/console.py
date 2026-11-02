@@ -1,8 +1,11 @@
 import os
 import time
+import logging
 import subprocess
 
 from rcon import Client
+
+log = logging.getLogger(__name__)
 
 
 class VConsole():
@@ -35,6 +38,11 @@ class RconConsole(VConsole):
     This is supported by most multiplayer games.
     '''
 
+    #: Seconds to wait for the game to answer a command before giving up.
+    #: Without it a game that dies mid-command leaves the caller blocked on a
+    #: socket read that never returns.
+    TIMEOUT = 300
+
     def __init__(self, ip, port, passwd):
         '''
         :param ip: The IP the game client is listening on (usually "127.0.0.1").
@@ -43,7 +51,7 @@ class RconConsole(VConsole):
         :type port: int
         :param passwd: The Rcon password to be used to issue commands.
         :type passwd: str'''
-        self.client = Client(ip, port, passwd=passwd)
+        self.client = Client(ip, port, passwd=passwd, timeout=self.TIMEOUT)
 
     def run(self, command, *params):
         return self.client.run(command, *params)
@@ -76,6 +84,7 @@ class ExecConsole(VConsole):
         self.cfgPath = os.path.join(self.gameDir, 'cfg', self.cfgName)
 
     def run(self, command, *params):
+        log.debug("ExecConsole running: %s %s", command, ' '.join(params))
         with open(self.cfgPath, "w") as f:
             f.seek(0)
             f.write(command + ' ' + ' '.join(params))
